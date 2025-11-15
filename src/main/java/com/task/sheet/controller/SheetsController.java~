@@ -1,0 +1,89 @@
+package com.task.sheet.controller;
+
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
+import com.task.sheet.service.SheetsIOService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
+
+@RestController
+@RequestMapping("/sheets")
+public class SheetsController {
+
+    private final SheetsIOService service;
+
+    public SheetsController(SheetsIOService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/{spreadsheetId}/values")
+    public List<List<Object>> read(
+            @PathVariable String spreadsheetId,
+            @RequestParam String range) throws IOException {
+        return service.readRange(spreadsheetId, range);
+    }
+
+    @PostMapping("/{spreadsheetId}/values")
+    public UpdateValuesResponse write(
+            @PathVariable String spreadsheetId,
+            @RequestParam String range,
+            @RequestBody List<List<Object>> values) throws IOException {
+        return service.writeRange(spreadsheetId, range, values);
+    }
+
+    @GetMapping(value = "/{spreadsheetId}/html", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> readAsHtml(
+            @PathVariable String spreadsheetId,
+            @RequestParam String range) throws IOException {
+
+        var rows = service.readRange(spreadsheetId, range);
+        String html = htmlWrapper("Sheet Data: " + range, toHtmlTable(rows));
+        return ResponseEntity.ok(html);
+    }
+
+    private String toHtmlTable(java.util.List<java.util.List<Object>> rows) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<table>");
+        for (int r = 0; r < (rows == null ? 0 : rows.size()); r++) {
+            var row = rows.get(r);
+            sb.append("<tr>");
+            for (var cell : row) {
+                String tag = (r == 0 ? "th" : "td");
+                sb.append("<").append(tag).append(">")
+                        .append(cell == null ? "" : String.valueOf(cell))
+                        .append("</").append(tag).append(">");
+            }
+            sb.append("</tr>");
+        }
+        sb.append("</table>");
+        return sb.toString();
+    }
+
+    private String htmlWrapper(String title, String tableHtml) {
+        return """
+         <!doctype html>
+         <html lang="en">
+         <head>
+           <meta charset="utf-8"/>
+           <meta name="viewport" content="width=device-width, initial-scale=1"/>
+           <title>%s</title>
+           <style>
+             body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px;}
+             h2{margin:0 0 16px;}
+             table{border-collapse:collapse;width:100%%;background:#fff;}
+             th,td{border:1px solid #e5e7eb;padding:8px 10px;vertical-align:top;}
+             th{background:#f3f4f6;text-align:left;}
+           </style>
+         </head>
+         <body>
+           <h2>%s</h2>
+           %s
+         </body>
+         </html>
+         """.formatted(title, title, tableHtml);
+    }
+}
+

@@ -1,0 +1,106 @@
+spring:
+  profiles:
+    active: dev
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/dat_work
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+server:
+  port: 8080
+
+google:
+  application-name: gsheet-export
+  credentials:
+    json-path: /opt/keys/seventh-oven.json
+  spreadsheet-id: 1wBxdVG8RRRYrdbABeCdkKY0p78162EIR74dCS24BF7o
+  export:
+    path: /opt/keys/
+    summary: /opt/automation/archive/AdCopy_check_Result.xlsx
+
+api:
+#  url: https://deetaanalyticsllc.com:8054
+  url: https://deetaanalyticsllc.com:8053
+
+crypto:
+  aes:
+    key-base64: "nTq3ZsP4O6F1e0sH9yWj5v2V6o9x2Tn7mLb8pHf3kU0="
+
+logging:
+  level:
+    org.springframework.web.filter.CorsFilter: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/dat_work
+    username: root
+    password: sQLmySq!2o23!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+server:
+  port: 8060
+#  ssl:
+#    key-store: /opt/automation/cert/keystore.jks
+#    key-store-password: duc@1234
+#    key-store-type: jks
+#    key-alias: tagbees
+#
+#    key-password: duc@1234
+#    enabled: true
+
+  ssl:
+    key-store: /opt/automation/cert/keystore.jks
+    key-store-password: duc@1234
+    key-store-type: PKCS12
+    key-alias: datteamwork.com (ZeroSSL RSA Domain Secure Site CA)
+    key-password: duc@1234
+    enabled: true
+
+google:
+  application-name: gsheet-export
+  credentials:
+    json-path: /opt/keys/seventh-oven.json
+  spreadsheet-id: 1lLj9p8KjYr4yqI1QK9b4V3lQ7f4e9c3a2b1
+  export:
+    path: /opt/scripts/
+    summary: /opt/automation/archive/AdCopy_check_Result.xlsx
+
+api:
+#  url: https://deetaanalyticsllc.com:8054
+  url: https://deetaanalyticsllc.com:8053
+
+crypto:
+  aes:
+    key-base64: "nTq3ZsP4O6F1e0sH9yWj5v2V6o9x2Tn7mLb8pHf3kU0="
+
+logging:
+  level:
+    org.springframework.web.filter.CorsFilter: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
